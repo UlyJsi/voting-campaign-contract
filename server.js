@@ -1,10 +1,17 @@
-const express = require('express');
-const app = express();
-const port = 3000;
+const { createServer } = require('http');
+const next = require('next');
 
-// routes
-app.get('/', (req, res) => res.send('Hello World!'));
-
-app.listen(port, () => {
-  console.log(`Listening on port ${port}!`)
+const app = next({
+  dev: process.env.NODE_ENV !== 'production'
 });
+
+const routes = require('./routes');
+const handler = routes.getRequestHandler(app);
+
+app.prepare().then(() => {
+  createServer(handler).listen(3000, err => {
+    if (err) throw err;
+    
+    console.log('Ready on localhost:3000');
+  })
+})
